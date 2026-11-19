@@ -6,9 +6,7 @@
 <title>实验室知识体系</title>
 <!-- AI 起草，待人工审核。内容由 _tools/build_doc_tree.py 写入 DATA；右栏为个人编写的「笔记」与「案例演示」。 -->
 <style>
-:root{--bg:#f7f9fc;--surface:#fff;--ink:#202a3b;--sub:#637189;--border:#e2e8f0;--blue:#235dbe;--selected:#eaf2ff;--root:#253954;--root-ink:#fff;--highlight:#edf4ff;--note:#fff8eb;--note-ink:#67491d;--hit:#ffe9a8;--own:#0f7b55;--teach:#8a5a00;--rf:15px;--rw:500px;color-scheme:light;--n0:#2f4858;--n0i:#fff;--n1:#b9ddc9;--n1b:#6cae8c;--n1i:#17402f;--n2:#e0f1e8;--n2b:#a8d3bd;--n2i:#1b4433;--n3:#eaf6f0;--n3b:#bcdfcc;--n3i:#23463a;--ng:#fdf1d8;--ngb:#dcb25f;--ngi:#6b4e12;--wire:#b8cfc2}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121720;--surface:#1b2230;--ink:#edf2fc;--sub:#b1bfd3;--border:#364153;--blue:#9ac0ff;--selected:#253f64;--root:#dce8ff;--root-ink:#1a2b46;--highlight:#243c5d;--note:#3e3222;--note-ink:#efcf93;--hit:#6b5716;--own:#6fd8ad;--teach:#efcf93;--n0:#dbe9f3;--n0i:#17293a;--n1:#24503f;--n1b:#3f7c63;--n1i:#d9f0e4;--n2:#1f3f34;--n2b:#356352;--n2i:#cfe8da;--n3:#1d3029;--n3b:#2d4d41;--n3i:#c3ded0;--ng:#403118;--ngb:#8a6c2c;--ngi:#f0d49b;--wire:#3c5a4c;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#121720;--surface:#1b2230;--ink:#edf2fc;--sub:#b1bfd3;--border:#364153;--blue:#9ac0ff;--selected:#253f64;--root:#dce8ff;--root-ink:#1a2b46;--highlight:#243c5d;--note:#3e3222;--note-ink:#efcf93;--hit:#6b5716;--own:#6fd8ad;--teach:#efcf93;--n0:#dbe9f3;--n0i:#17293a;--n1:#24503f;--n1b:#3f7c63;--n1i:#d9f0e4;--n2:#1f3f34;--n2b:#356352;--n2i:#cfe8da;--n3:#1d3029;--n3b:#2d4d41;--n3i:#c3ded0;--ng:#403118;--ngb:#8a6c2c;--ngi:#f0d49b;--wire:#3c5a4c;color-scheme:dark}
+:root{--bg:#f7f9fc;--surface:#fff;--ink:#1e293b;--sub:#64748b;--border:#e2e8f0;--blue:#235dbe;--selected:#eaf2ff;--root:#253954;--root-ink:#fff;--highlight:#edf4ff;--note:#fff8eb;--note-ink:#67491d;--hit:#ffe9a8;--own:#0f7b55;--teach:#8a5a00;--rf:15px;--rw:500px;color-scheme:light;--n0:#2f4858;--n0i:#fff;--n1:#b9ddc9;--n1b:#6cae8c;--n1i:#17402f;--n2:#e0f1e8;--n2b:#a8d3bd;--n2i:#1b4433;--n3:#eaf6f0;--n3b:#bcdfcc;--n3i:#23463a;--n4:#f4faf7;--n4b:#cfe8da;--n4i:#2c5244;--ng:#fdf1d8;--ngb:#dcb25f;--ngi:#6b4e12;--wire:#b8cfc2}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
 body{background:var(--bg);color:var(--ink);font:14px/1.55 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"PingFang SC","Segoe UI",sans-serif;padding:10px;overflow:hidden}
@@ -107,28 +105,28 @@ button[aria-pressed="true"] .nb-tab-count{background:var(--blue);color:#fff}
 .nb-textarea{flex:1;width:100%;min-height:0;resize:none;border:1px solid var(--border);border-radius:10px;background:var(--surface);padding:12px 14px;font-size:var(--rf);line-height:1.75;color:var(--ink);overflow:auto}
 .nb-textarea::placeholder{color:var(--sub);opacity:.65}
 
-/* 增强版 Markdown 可视化阅读样式 + 专业术语蓝色跳转与词条高亮 */
-.nb-preview{flex:1;min-height:0;overflow:auto;border:1px solid var(--border);border-radius:10px;background:var(--surface);padding:18px 22px;font-size:var(--rf);line-height:1.85;overflow-wrap:anywhere;scroll-behavior:smooth}
+/* 增强版 Markdown 可视化阅读样式：白底清爽排版，仅注释区使用浅灰底，可跳转术语为蓝字 */
+.nb-preview{flex:1;min-height:0;overflow:auto;border:1px solid var(--border);border-radius:10px;background:#ffffff;color:#1e293b;padding:18px 22px;font-size:var(--rf);line-height:1.85;overflow-wrap:anywhere;scroll-behavior:smooth}
 .nb-preview p{margin:0 0 11px}
-.nb-preview h1,.nb-preview h2,.nb-preview h3,.nb-preview h4{margin:18px 0 10px;font-weight:700;line-height:1.45;color:var(--ink)}
+.nb-preview h1,.nb-preview h2,.nb-preview h3,.nb-preview h4{margin:18px 0 10px;font-weight:700;line-height:1.45;color:#0f172a}
 .nb-preview h1:first-child,.nb-preview h2:first-child,.nb-preview h3:first-child{margin-top:0}
 .nb-preview h1{font-size:calc(var(--rf) + 4px);padding-bottom:6px;border-bottom:2px solid var(--border)}
-.nb-preview h2{font-size:calc(var(--rf) + 2px);padding:6px 12px;border-left:4px solid #475569;background:#f1f5f9;border-radius:0 7px 7px 0;color:#0f172a}
+.nb-preview h2{font-size:calc(var(--rf) + 2px);padding:4px 0 6px 10px;border-left:4px solid #334155;border-bottom:1px solid #e2e8f0;background:transparent;color:#0f172a}
 .nb-preview h3{font-size:calc(var(--rf) + 1px);padding-left:9px;border-left:3px solid #94a3b8;color:#1e293b}
 .nb-preview h4{font-size:var(--rf);color:#334155;font-weight:700}
 .nb-preview hr.nb-hr{border:0;height:1px;background:#e2e8f0;margin:18px 0}
 .nb-preview ul,.nb-preview ol{padding-left:1.35em;margin:6px 0 12px}
 .nb-preview li{margin:6px 0}
 .nb-preview li::marker{color:#64748b;font-weight:600}
-.nb-preview li.nb-def-card{list-style:none;margin:9px 0 9px -1.35em;padding:10px 14px;border:1px solid #e2e8f0;border-left:3px solid #64748b;border-radius:8px;background:#f8fafc;transition:background .25s,box-shadow .25s,border-color .25s;scroll-margin-top:24px}
-@keyframes nbDefPulse{0%{background:#fef3c7;border-left-color:var(--blue);box-shadow:0 0 0 3px rgba(35,93,190,.2)}70%{background:#fef3c7;border-left-color:var(--blue)}100%{background:#f8fafc;box-shadow:none}}
+.nb-preview li.nb-def-card{list-style:none;margin:9px 0 9px -1.35em;padding:10px 14px;border:1px solid #e2e8f0;border-left:3px solid #94a3b8;border-radius:8px;background:#f1f5f9;color:#1e293b;transition:background .25s,box-shadow .25s,border-color .25s;scroll-margin-top:24px}
+@keyframes nbDefPulse{0%{background:#fef3c7;border-left-color:var(--blue);box-shadow:0 0 0 3px rgba(35,93,190,.2)}70%{background:#fef3c7;border-left-color:var(--blue)}100%{background:#f1f5f9;box-shadow:none}}
 .nb-preview li.nb-def-card.nb-def-flash{animation:nbDefPulse 2.2s ease-out}
-.nb-preview a.nb-term-link{color:var(--blue);background:#f1f5f9;font-weight:600;text-decoration:none;padding:1px 6px;border-radius:5px;cursor:pointer;transition:background .15s,color .15s}
-.nb-preview a.nb-term-link:hover{background:#e2e8f0;text-decoration:underline}
-.nb-preview strong{font-weight:700;color:var(--ink)}
+.nb-preview a.nb-term-link{color:var(--blue);background:transparent;font-weight:600;text-decoration:underline;text-decoration-color:rgba(35,93,190,.45);text-underline-offset:3px;padding:0 2px;border-radius:3px;cursor:pointer;transition:background .15s,color .15s}
+.nb-preview a.nb-term-link:hover{background:#eff6ff;text-decoration-color:var(--blue)}
+.nb-preview strong{font-weight:700;color:#0f172a}
 .nb-preview a.nb-term-link strong{color:var(--blue)}
 .nb-preview mark{background:#fef3c7;color:#3a2d08;padding:1px 5px;border-radius:4px;font-weight:600}
-.nb-preview .nb-tag-chip{display:inline-block;background:#e2e8f0;color:#1e293b;font-weight:700;font-size:.92em;padding:2px 8px;border-radius:6px;margin-right:4px}
+.nb-preview .nb-tag-chip{display:inline;background:transparent;color:#0f172a;font-weight:700;padding:0;margin-right:2px}
 .nb-preview code{background:#f1f5f9;border:1px solid #e2e8f0;padding:1px 5px;border-radius:4px;font-size:.9em;color:#334155}
 .nb-preview pre{background:#f8fafc;padding:10px 12px;border-radius:8px;overflow-x:auto;margin:10px 0;border:1px solid #e2e8f0}
 .nb-preview pre code{border:0;padding:0;color:var(--ink)}
@@ -6495,7 +6493,7 @@ function renderMarkdown(md){
     t=t.replace(/==(.+?)==/g,"<mark>$1</mark>");
     t=t.replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>");
     t=t.replace(/\*(.+?)\*/g,"<em>$1</em>");
-    t=t.replace(/【([^】]+)】/g,'<span class="nb-tag-chip">$1</span>');
+    t=t.replace(/【([^】]+)】/g,'<span class="nb-tag-chip">【$1】</span>');
     t=t.replace(/^([A-Za-z0-9\u4e00-\u9fa5（）()／/·\-]{2,14})([：:])/,"<strong>$1$2</strong>");
     if(enableTermLink)t=linkTermsInHtml(t);
     return t;
