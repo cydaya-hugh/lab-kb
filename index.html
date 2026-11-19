@@ -1,0 +1,1071 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>实验室知识体系</title>
+<!-- AI 起草，待人工审核。内容由 _tools/build_doc_tree.py 写入 DATA；右栏为个人编写的「笔记」与「案例演示」。 -->
+<style>
+:root{--bg:#f7f9fc;--surface:#fff;--ink:#202a3b;--sub:#637189;--border:#e2e8f0;--blue:#235dbe;--selected:#eaf2ff;--root:#253954;--root-ink:#fff;--highlight:#edf4ff;--note:#fff8eb;--note-ink:#67491d;--hit:#ffe9a8;--own:#0f7b55;--teach:#8a5a00;--rf:15px;--rw:500px;color-scheme:light;--n0:#2f4858;--n0i:#fff;--n1:#b9ddc9;--n1b:#6cae8c;--n1i:#17402f;--n2:#e0f1e8;--n2b:#a8d3bd;--n2i:#1b4433;--n3:#eaf6f0;--n3b:#bcdfcc;--n3i:#23463a;--ng:#fdf1d8;--ngb:#dcb25f;--ngi:#6b4e12;--wire:#b8cfc2}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121720;--surface:#1b2230;--ink:#edf2fc;--sub:#b1bfd3;--border:#364153;--blue:#9ac0ff;--selected:#253f64;--root:#dce8ff;--root-ink:#1a2b46;--highlight:#243c5d;--note:#3e3222;--note-ink:#efcf93;--hit:#6b5716;--own:#6fd8ad;--teach:#efcf93;--n0:#dbe9f3;--n0i:#17293a;--n1:#24503f;--n1b:#3f7c63;--n1i:#d9f0e4;--n2:#1f3f34;--n2b:#356352;--n2i:#cfe8da;--n3:#1d3029;--n3b:#2d4d41;--n3i:#c3ded0;--ng:#403118;--ngb:#8a6c2c;--ngi:#f0d49b;--wire:#3c5a4c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121720;--surface:#1b2230;--ink:#edf2fc;--sub:#b1bfd3;--border:#364153;--blue:#9ac0ff;--selected:#253f64;--root:#dce8ff;--root-ink:#1a2b46;--highlight:#243c5d;--note:#3e3222;--note-ink:#efcf93;--hit:#6b5716;--own:#6fd8ad;--teach:#efcf93;--n0:#dbe9f3;--n0i:#17293a;--n1:#24503f;--n1b:#3f7c63;--n1i:#d9f0e4;--n2:#1f3f34;--n2b:#356352;--n2i:#cfe8da;--n3:#1d3029;--n3b:#2d4d41;--n3i:#c3ded0;--ng:#403118;--ngb:#8a6c2c;--ngi:#f0d49b;--wire:#3c5a4c;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:14px/1.55 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"PingFang SC","Segoe UI",sans-serif;padding:10px;overflow:hidden}
+h2,h3,h4,p{margin:0}
+h2{font-size:18px;line-height:1.35;font-weight:600}
+h3,h4{font-size:14px;font-weight:500}
+button,select,input,textarea{font:inherit;color:var(--ink)}
+button{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:6px 10px;line-height:1.4;cursor:pointer}
+button:hover{background:var(--selected)}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+button:disabled{opacity:.45;cursor:default}
+button[aria-pressed="true"]{background:var(--selected);border-color:var(--blue);color:var(--blue);font-weight:500}
+[hidden]{display:none!important}
+#nb{height:100%;display:flex;flex-direction:column;background:var(--bg);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.nb-header{padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid var(--border);background:var(--surface);flex-wrap:wrap}
+.nb-views{display:flex;gap:6px;flex-wrap:wrap}
+.nb-views button{font-size:13px;padding:6px 13px}
+.nb-mobile-tabs{display:none}
+.nb-workspace{flex:1;min-height:0;display:grid;grid-template-columns:minmax(260px,1fr) 8px var(--rw)}
+.nb-map-pane{min-width:0;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.nb-map-stage{position:relative;flex:1;min-height:240px;overflow:hidden;touch-action:none;cursor:grab;user-select:none}
+.nb-map-stage.nb-dragging{cursor:grabbing}
+.nb-map-edges{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.nb-map-edges path{fill:none;stroke:var(--wire);stroke-width:1.5;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.nb-map-edges path.nb-active{stroke:var(--blue);stroke-width:2.2}
+.nb-map-plane{position:absolute;left:0;top:0;transform-origin:0 0}
+.nb-node{position:absolute;display:flex;align-items:center;gap:2px;white-space:nowrap;width:max-content;max-width:260px}
+.nb-node-button{padding:8px 13px;border-radius:9px;max-width:245px;white-space:normal;font-size:13px;line-height:1.5;text-align:left;background:var(--n3);border:1px solid var(--n3b);color:var(--n3i);box-shadow:0 1px 2px #0000000d;transition:box-shadow .12s,transform .12s;position:relative}
+.nb-node-button:hover{background:var(--n3);box-shadow:0 2px 8px #00000018;transform:translateY(-1px)}
+.nb-node-button[aria-pressed="true"]{outline:2px solid var(--blue);outline-offset:1px}
+.nb-node-button.d1{background:var(--n1);border-color:var(--n1b);color:var(--n1i);font-weight:600;font-size:13.5px;padding:9px 15px}
+.nb-node-button.d1:hover{background:var(--n1)}
+.nb-node-button.d2{background:var(--n2);border-color:var(--n2b);color:var(--n2i);font-weight:500}
+.nb-node-button.d2:hover{background:var(--n2)}
+.nb-node-root,.nb-node-root.d1{background:var(--n0);color:var(--n0i);border-color:var(--n0);font-weight:600;font-size:14px;padding:11px 18px;border-radius:11px}
+.nb-node-root:hover,.nb-node-root[aria-pressed="true"]{background:var(--n0);color:var(--n0i);border-color:var(--n0)}
+.nb-node-gate,.nb-node-gate.d2,.nb-node-gate.d1{background:var(--ng);border-color:var(--ngb);color:var(--ngi);border-left-width:4px;font-weight:600}
+.nb-node-gate:hover{background:var(--ng)}
+.nb-node-button.nb-hit{background:var(--hit);border-color:var(--note-ink);color:#3a2d08}
+.nb-node-badges{display:inline-flex;gap:3px;margin-left:5px;vertical-align:1px}
+.nb-badge-dot{display:inline-block;width:7px;height:7px;border-radius:50%}
+.nb-badge-note{background:var(--blue)}
+.nb-badge-case{background:var(--own)}
+.nb-node-toggle{border:1px solid var(--n2b);background:var(--surface);color:var(--sub);width:20px;height:20px;min-width:20px;padding:0;margin-left:4px;border-radius:50%;font-size:11px;line-height:1;display:flex;align-items:center;justify-content:center}
+.nb-node-toggle:hover{border-color:var(--blue);color:var(--blue);background:var(--selected)}
+.nb-map-tools{display:flex;align-items:center;gap:8px;padding:7px 14px;flex-wrap:wrap;border-top:1px solid var(--border);background:var(--surface)}
+.nb-map-tools button{border:0;background:transparent;font-size:12px;padding:4px 7px}
+.nb-map-tools button:hover{background:var(--selected)}
+.nb-tool-group{display:flex;gap:4px;align-items:center}
+.nb-small{font-size:11px;color:var(--sub)}
+.nb-legend{display:flex;gap:10px;align-items:center;font-size:11px;color:var(--sub);flex-wrap:wrap;margin-left:auto}
+.nb-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:0}
+.nb-legend .ln{background:var(--blue)}
+.nb-legend .lc{background:var(--own)}
+.nb-search{border:1px solid var(--border);background:var(--bg);border-radius:7px;padding:4px 9px;font-size:12px;width:165px}
+.nb-resize{padding:0;border:0;border-radius:0;background:var(--border);touch-action:none;min-height:0}
+.nb-resize:hover,.nb-resize:focus-visible{background:var(--blue)}
+.nb-resize-width{width:8px;cursor:col-resize}
+
+/* 右栏：全高单面板（笔记 / 案例演示） */
+.nb-reader-pane{min-width:0;display:flex;flex-direction:column;background:var(--surface);overflow:hidden}
+.nb-right-top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.nb-read-tabs{display:flex;gap:6px;flex:1;min-width:170px}
+.nb-read-tabs button{font-size:13px;flex:1;padding:6px 10px;display:flex;align-items:center;justify-content:center;gap:6px}
+.nb-tab-count{font-size:11px;padding:1px 6px;border-radius:10px;background:var(--bg);color:var(--sub);font-weight:500}
+button[aria-pressed="true"] .nb-tab-count{background:var(--blue);color:#fff}
+.nb-top-actions{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.nb-top-actions button{font-size:11.5px;padding:4px 8px;border-radius:6px;color:var(--sub)}
+.nb-top-actions button:hover{color:var(--ink)}
+.nb-top-actions .nb-copy-ai{color:var(--blue);border-color:var(--blue);background:var(--selected);font-weight:500}
+
+.nb-node-bar{padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.nb-node-info{min-width:0;flex:1}
+.nb-topic-path{font-size:11px;color:var(--sub);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nb-node-info h3{font-size:calc(var(--rf) + 1px);font-weight:600;line-height:1.4;word-break:break-word}
+.nb-node-meta{display:flex;align-items:center;gap:6px;flex:none}
+.nb-save-state{font-size:11px;color:var(--sub);white-space:nowrap}
+.nb-save-state.saved{color:var(--own)}
+.nb-mode-btn{font-size:11.5px;padding:4px 9px;border-radius:6px}
+
+/* Markdown 可视化工具栏 */
+.nb-md-toolbar{display:flex;align-items:center;gap:4px;padding:7px 16px;border-bottom:1px solid var(--border);background:var(--surface);flex-wrap:wrap}
+.nb-md-toolbar button{font-size:11.5px;padding:3px 7px;border-radius:6px;background:var(--bg);border:1px solid var(--border);color:var(--ink)}
+.nb-md-toolbar button:hover{background:var(--selected);border-color:var(--blue);color:var(--blue)}
+.nb-md-toolbar .nb-beautify{margin-left:auto;background:var(--note);border-color:#e2c68d;color:var(--note-ink);font-weight:500}
+.nb-md-toolbar .nb-beautify:hover{background:#ffefcc;border-color:var(--note-ink)}
+
+.nb-panel-body{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.nb-editor-wrap{flex:1;min-height:0;display:flex;flex-direction:column;padding:12px 16px 16px;gap:10px}
+.nb-textarea{flex:1;width:100%;min-height:0;resize:none;border:1px solid var(--border);border-radius:10px;background:var(--surface);padding:12px 14px;font-size:var(--rf);line-height:1.75;color:var(--ink);overflow:auto}
+.nb-textarea::placeholder{color:var(--sub);opacity:.65}
+
+/* 增强版 Markdown 可视化预览样式 */
+.nb-preview{flex:1;min-height:0;overflow:auto;border:1px solid var(--border);border-radius:10px;background:var(--surface);padding:16px 18px;font-size:var(--rf);line-height:1.8;overflow-wrap:anywhere}
+.nb-preview p{margin:0 0 10px}
+.nb-preview h1,.nb-preview h2,.nb-preview h3,.nb-preview h4{margin:16px 0 8px;font-weight:700;line-height:1.4;color:var(--ink)}
+.nb-preview h1:first-child,.nb-preview h2:first-child,.nb-preview h3:first-child{margin-top:0}
+.nb-preview h1{font-size:calc(var(--rf) + 4px);padding-bottom:6px;border-bottom:2px solid var(--blue)}
+.nb-preview h2{font-size:calc(var(--rf) + 2px);padding:4px 0 4px 10px;border-left:4px solid var(--blue);background:var(--highlight);border-radius:0 6px 6px 0}
+.nb-preview h3{font-size:calc(var(--rf) + 1px);padding-left:8px;border-left:3px solid var(--n1b)}
+.nb-preview h4{font-size:var(--rf);color:var(--blue)}
+.nb-preview hr.nb-hr{border:0;height:1px;background:linear-gradient(90deg,var(--blue) 0%,var(--border) 60%,transparent 100%);margin:16px 0}
+.nb-preview ul,.nb-preview ol{padding-left:1.4em;margin:6px 0 12px}
+.nb-preview li{margin:4px 0}
+.nb-preview li::marker{color:var(--blue);font-weight:600}
+.nb-preview strong{font-weight:700;color:var(--ink)}
+.nb-preview mark{background:var(--hit);color:#3a2d08;padding:1px 5px;border-radius:4px;font-weight:600}
+.nb-preview .nb-tag-chip{display:inline-block;background:var(--selected);color:var(--blue);border:1px solid var(--blue);font-weight:600;font-size:.88em;padding:0 6px;border-radius:5px;margin-right:4px}
+.nb-preview code{background:var(--bg);border:1px solid var(--border);padding:1px 5px;border-radius:4px;font-size:.9em;color:var(--blue)}
+.nb-preview pre{background:var(--bg);padding:10px 12px;border-radius:8px;overflow-x:auto;margin:10px 0;border:1px solid var(--border)}
+.nb-preview pre code{border:0;padding:0;color:var(--ink)}
+.nb-preview blockquote{margin:10px 0;padding:9px 13px;border-left:4px solid var(--ngb);background:var(--note);color:var(--note-ink);border-radius:0 8px 8px 0}
+.nb-preview table{border-collapse:collapse;font-size:calc(var(--rf) - 1px);width:100%;margin:10px 0;border-radius:6px;overflow:hidden}
+.nb-preview th,.nb-preview td{border:1px solid var(--border);padding:7px 9px;text-align:left;vertical-align:top}
+.nb-preview th{background:var(--bg);font-weight:600}
+.nb-empty{color:var(--sub);font-size:calc(var(--rf) - 1px)}
+
+/* 案例演示栏专属控件 */
+.nb-case-tabs{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.nb-case-pill{font-size:12px;padding:4px 10px;border-radius:7px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nb-case-add{font-size:12px;padding:4px 9px;border-radius:7px;border-style:dashed;color:var(--blue)}
+.nb-case-del{font-size:12px;padding:4px 8px;border-radius:7px;color:#c53030;margin-left:auto}
+.nb-case-del:hover{background:#fff5f5;border-color:#feb2b2}
+.nb-case-fields{display:grid;grid-template-columns:1fr 130px;gap:8px}
+.nb-input{border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-size:calc(var(--rf) - 1px);background:var(--surface);width:100%;font-weight:500}
+.nb-input::placeholder{color:var(--sub);opacity:.65;font-weight:400}
+
+@media(max-width:900px){.nb-workspace{grid-template-columns:minmax(0,1fr) 8px 360px}}
+@media(max-width:650px){
+ body{padding:0;overflow:auto}
+ #nb{border-radius:0;border:0;height:auto;min-height:100%}
+ .nb-header{padding:10px 14px}
+ .nb-views{width:100%}.nb-views button{flex:1;padding:6px 4px;font-size:12px}
+ .nb-mobile-tabs{display:flex;padding:8px 12px;gap:8px;border-bottom:1px solid var(--border);background:var(--surface)}
+ .nb-mobile-tabs button{flex:1;font-size:13px}
+ .nb-workspace{display:block}
+ .nb-resize-width{display:none}
+ .nb-map-pane,.nb-reader-pane{height:calc(100vh - 120px);min-height:500px}
+ #nb[data-mobile="map"] .nb-reader-pane{display:none}
+ #nb[data-mobile="read"] .nb-map-pane{display:none}
+ .nb-search{width:120px}
+}
+@media(pointer:coarse){button{min-height:36px}}
+</style>
+<script>
+// AI 与浏览器本地笔记双向同步数据文件（由 AIOS 实时落盘更新）
+window.LABKB_SYNC_DATA = {
+  "learn.0": {
+    "key": "learn.0",
+    "path": "基础知识学习 / State-of-the-Art前沿调研",
+    "title": "State-of-the-Art前沿调研",
+    "note": "## **1. 整体定义**\n- **核心目标**：在花钱合成基因、进实验室动手之前，先通过数据库、文献、专利和客户需求，弄清 ==「做哪个分子、怎么切、用什么宿主和标签、最大风险在哪、怎么算合格」==。\n- **管理意义**：这是研发成本最低、但决定生死的一步。起点选错（如漏看自聚区或非特异结合区），后面几个月的表达和纯化都会在错误路线上返工。\n\n---\n\n## **2. 核心调研逻辑（两大动作）**\n1. **【靶点与结构特征分析】**（摸清分子脾气）：\n   - **锁序列**：从 UniProt 锁定唯一标准序列与版本号（防坐标错位）。\n   - **看结构**：评估一至四级结构域边界、疏水自聚区、金属结合位点（防乱切降解、防包涵体）。\n   - **看修饰**：评估自身抗体是否依赖糖基化/二硫键（决定能不能用低成本大肠杆菌）。\n2. **【文献与策略锚定】**（站在前人肩膀上）：\n   - **查顶刊与公开 SOP**：建立证据矩阵，区分「文献事实」与「待验证假设」。\n   - **定防聚与标签方案**：针对难溶蛋白提前规划「助溶大标签（MBP/SUMO）+ 酶切位点（TEV）+ 低温慢速诱导」。\n\n---\n\n## **3. Gate R1 审核抓手（管理者必问）**\n> **不过关红线**：未明确客户检测平台（直接包被 vs. 生物素捕获）、未锁定基准序列版本、或把文献结果直接当成已验证工艺时，严禁直接进入全量合成与生产。",
+    "cases": [
+      {
+        "title": "Ro52 (TRIM21) 前沿调研全景推演",
+        "tag": "实战案例",
+        "body": "## **1. 靶点底牌（摸清脾气）**\n- **基准序列**：UniProt `P19474`（Version 1），全长 ==475 aa==（约 54.2 kDa），天然无糖基化，可用大肠杆菌表达。\n- **两大结构隐患**：\n  1. **【包涵体隐患】**：中间 `Coiled-Coil 卷曲螺旋区（128–238 aa）` 既是核心免疫优势区，又极易疏水自聚，裸蛋白原核表达 >90% 进包涵体。\n  2. **【假阳性隐患】**：C 端 `PRY/SPRY 域（268–475 aa）` 天然结合人 IgG 的 Fc 段，在血清学检测中易产生非特异背景。\n\n---\n\n## **2. 锚定策略（立项路线）**\n- **平行对比路线**：以 **路线 A（全长 1–475 aa）** 为基准参照，平行开发 **路线 B（125–268 aa 核心表位截短体，切掉 C 端 Fc 结合域）**。\n- **保溶方案**：采用 `N端 6xHis-MBP-TEV` 助溶标签 + `Rosetta(DE3)` 16°C 低温诱导（全长补加 $50\\ \\mu\\text{M ZnCl}_2$ 稳定 N 端锌指）。"
+      }
+    ],
+    "updatedAt": "2026-11-18T12:18:00.000Z"
+  },
+  "基础知识学习::基础知识学习/State-of-the-Art前沿调研": {
+    "key": "learn.0",
+    "path": "基础知识学习 / State-of-the-Art前沿调研",
+    "title": "State-of-the-Art前沿调研",
+    "note": "## **1. 整体定义**\n- **核心目标**：在花钱合成基因、进实验室动手之前，先通过数据库、文献、专利和客户需求，弄清 ==「做哪个分子、怎么切、用什么宿主和标签、最大风险在哪、怎么算合格」==。\n- **管理意义**：这是研发成本最低、但决定生死的一步。起点选错（如漏看自聚区或非特异结合区），后面几个月的表达和纯化都会在错误路线上返工。\n\n---\n\n## **2. 核心调研逻辑（两大动作）**\n1. **【靶点与结构特征分析】**（摸清分子脾气）：\n   - **锁序列**：从 UniProt 锁定唯一标准序列与版本号（防坐标错位）。\n   - **看结构**：评估一至四级结构域边界、疏水自聚区、金属结合位点（防乱切降解、防包涵体）。\n   - **看修饰**：评估自身抗体是否依赖糖基化/二硫键（决定能不能用低成本大肠杆菌）。\n2. **【文献与策略锚定】**（站在前人肩膀上）：\n   - **查顶刊与公开 SOP**：建立证据矩阵，区分「文献事实」与「待验证假设」。\n   - **定防聚与标签方案**：针对难溶蛋白提前规划「助溶大标签（MBP/SUMO）+ 酶切位点（TEV）+ 低温慢速诱导」。\n\n---\n\n## **3. Gate R1 审核抓手（管理者必问）**\n> **不过关红线**：未明确客户检测平台（直接包被 vs. 生物素捕获）、未锁定基准序列版本、或把文献结果直接当成已验证工艺时，严禁直接进入全量合成与生产。",
+    "cases": [
+      {
+        "title": "Ro52 (TRIM21) 前沿调研全景推演",
+        "tag": "实战案例",
+        "body": "## **1. 靶点底牌（摸清脾气）**\n- **基准序列**：UniProt `P19474`（Version 1），全长 ==475 aa==（约 54.2 kDa），天然无糖基化，可用大肠杆菌表达。\n- **两大结构隐患**：\n  1. **【包涵体隐患】**：中间 `Coiled-Coil 卷曲螺旋区（128–238 aa）` 既是核心免疫优势区，又极易疏水自聚，裸蛋白原核表达 >90% 进包涵体。\n  2. **【假阳性隐患】**：C 端 `PRY/SPRY 域（268–475 aa）` 天然结合人 IgG 的 Fc 段，在血清学检测中易产生非特异背景。\n\n---\n\n## **2. 锚定策略（立项路线）**\n- **平行对比路线**：以 **路线 A（全长 1–475 aa）** 为基准参照，平行开发 **路线 B（125–268 aa 核心表位截短体，切掉 C 端 Fc 结合域）**。\n- **保溶方案**：采用 `N端 6xHis-MBP-TEV` 助溶标签 + `Rosetta(DE3)` 16°C 低温诱导（全长补加 $50\\ \\mu\\text{M ZnCl}_2$ 稳定 N 端锌指）。"
+      }
+    ],
+    "updatedAt": "2026-11-18T12:18:00.000Z"
+  },
+  "learn.0.0.0": {
+    "key": "learn.0.0.0",
+    "path": "基础知识学习 / State-of-the-Art前沿调研 / 靶点与结构特征分析 / 氨基酸序列获取: UniProt数据库标准序列",
+    "title": "氨基酸序列获取: UniProt数据库标准序列",
+    "note": "## **1. 概述（整体定义与目的）**\n- **核心原则**：任何重组蛋白项目的起点，都是锁定**唯一的、受控的氨基酸基准序列（Canonical Sequence）**及其异构体（Isoforms）。\n- **为什么要锁死**：必须从 `UniProt` 获取带明确**登录号（Accession）**和**序列版本号（Sequence Version）**的标准序列，避免团队内部误用截短体、突变体或不同物种序列，导致后续 ==引物设计、质粒构建和表位坐标全部错位==。\n\n---\n\n## **2. 核心概念定义（白话词典）**\n- **【UniProt】**：全球最权威的蛋白质序列与功能数据库（相当于蛋白质界的“国家标准户籍库”），网址为 `uniprot.org`。\n- **【氨基酸基准序列（Canonical Sequence）】**：同一个基因在数据库里被指定为“默认主代表”的那条全长标准氨基酸序列（通常是最常见、最完整的功能形式，编号为 `-1`）。所有结构域和表位的坐标（如第几到第几号氨基酸）都以它为唯一标尺。\n- **【异构体（Isoforms）】**：同一个基因由于 mRNA 选择性剪接（切掉了某段外显子）或不同起始位点，翻译出来的“同胞兄弟蛋白”。名字很像但长度和结构不同（如 `Ro52α` 与 `Ro52β`）。\n- **【登录号与序列版本（Accession & Version）】**：蛋白质在 UniProt 中的唯一身份证号（如 `P19474`）及序列修订版次（如 `Version 1`）。**只写蛋白名字不写登录号，等于没有受控标准**。\n\n---\n\n## **3. Gate 审核抓手（怎么检查）**\n> **立项必查**：立项书与序列设计文件上是否明确写出了 **UniProt 登录号 + 序列版本号 + 起止氨基酸坐标（如 `P19474, v1, 1–475 aa`）**？没写一律退回补齐。",
+    "cases": [
+      {
+        "title": "Ro52 案例：UniProt 标准序列锁定与异构体防错",
+        "tag": "实战案例",
+        "body": "## **1. 标准序列锁定**\n- **靶点名称**：人源 Ro52（基因名 `TRIM21`）\n- **UniProt 登录号**：==`P19474`==（条目名：`RO52_HUMAN`，Sequence Version 1）\n- **基准规格**：全长共 **475 个氨基酸（1–475 aa）**，理论分子量约 **54.2 kDa**。\n\n---\n\n## **2. 防错要点（Ro52α vs. Ro52β）**\n- **常见踩坑点**：文献中常同时出现 `Ro52α`（全长 475 aa，即 `P19474-1`）和缺少中间第 4 外显子（缺失部分卷曲螺旋核心表位区）的剪接异构体 `Ro52β`。\n- **坐标错位风险**：如果不锁死基准序列，不同文献或不同研发人员说的“第 125–268 位”或“p200 肽段（200–239 aa）”就会对不上号。\n\n---\n\n> **立项受控写法**：在立项书与 LabOS 中必须写死 —— **「基准序列：基于 UniProt `P19474` (Version 1, 1–475 aa)」**，以此作为全长参照及后续 `125–268 aa` 截短体设计的唯一坐标尺子。"
+      }
+    ],
+    "updatedAt": "2026-11-18T12:18:00.000Z"
+  },
+  "基础知识学习::基础知识学习/State-of-the-Art前沿调研/靶点与结构特征分析/氨基酸序列获取: UniProt数据库标准序列": {
+    "key": "learn.0.0.0",
+    "path": "基础知识学习 / State-of-the-Art前沿调研 / 靶点与结构特征分析 / 氨基酸序列获取: UniProt数据库标准序列",
+    "title": "氨基酸序列获取: UniProt数据库标准序列",
+    "note": "## **1. 概述（整体定义与目的）**\n- **核心原则**：任何重组蛋白项目的起点，都是锁定**唯一的、受控的氨基酸基准序列（Canonical Sequence）**及其异构体（Isoforms）。\n- **为什么要锁死**：必须从 `UniProt` 获取带明确**登录号（Accession）**和**序列版本号（Sequence Version）**的标准序列，避免团队内部误用截短体、突变体或不同物种序列，导致后续 ==引物设计、质粒构建和表位坐标全部错位==。\n\n---\n\n## **2. 核心概念定义（白话词典）**\n- **【UniProt】**：全球最权威的蛋白质序列与功能数据库（相当于蛋白质界的“国家标准户籍库”），网址为 `uniprot.org`。\n- **【氨基酸基准序列（Canonical Sequence）】**：同一个基因在数据库里被指定为“默认主代表”的那条全长标准氨基酸序列（通常是最常见、最完整的功能形式，编号为 `-1`）。所有结构域和表位的坐标（如第几到第几号氨基酸）都以它为唯一标尺。\n- **【异构体（Isoforms）】**：同一个基因由于 mRNA 选择性剪接（切掉了某段外显子）或不同起始位点，翻译出来的“同胞兄弟蛋白”。名字很像但长度和结构不同（如 `Ro52α` 与 `Ro52β`）。\n- **【登录号与序列版本（Accession & Version）】**：蛋白质在 UniProt 中的唯一身份证号（如 `P19474`）及序列修订版次（如 `Version 1`）。**只写蛋白名字不写登录号，等于没有受控标准**。\n\n---\n\n## **3. Gate 审核抓手（怎么检查）**\n> **立项必查**：立项书与序列设计文件上是否明确写出了 **UniProt 登录号 + 序列版本号 + 起止氨基酸坐标（如 `P19474, v1, 1–475 aa`）**？没写一律退回补齐。",
+    "cases": [
+      {
+        "title": "Ro52 案例：UniProt 标准序列锁定与异构体防错",
+        "tag": "实战案例",
+        "body": "## **1. 标准序列锁定**\n- **靶点名称**：人源 Ro52（基因名 `TRIM21`）\n- **UniProt 登录号**：==`P19474`==（条目名：`RO52_HUMAN`，Sequence Version 1）\n- **基准规格**：全长共 **475 个氨基酸（1–475 aa）**，理论分子量约 **54.2 kDa**。\n\n---\n\n## **2. 防错要点（Ro52α vs. Ro52β）**\n- **常见踩坑点**：文献中常同时出现 `Ro52α`（全长 475 aa，即 `P19474-1`）和缺少中间第 4 外显子（缺失部分卷曲螺旋核心表位区）的剪接异构体 `Ro52β`。\n- **坐标错位风险**：如果不锁死基准序列，不同文献或不同研发人员说的“第 125–268 位”或“p200 肽段（200–239 aa）”就会对不上号。\n\n---\n\n> **立项受控写法**：在立项书与 LabOS 中必须写死 —— **「基准序列：基于 UniProt `P19474` (Version 1, 1–475 aa)」**，以此作为全长参照及后续 `125–268 aa` 截短体设计的唯一坐标尺子。"
+      }
+    ],
+    "updatedAt": "2026-11-18T12:18:00.000Z"
+  }
+};
+
+</script>
+</head>
+<body>
+<div id="nb" data-mobile="map">
+  <header class="nb-header">
+    <div style="display:flex;align-items:center;gap:12px">
+      <a href="/okr" id="nb-back-okr" style="font-size:13px;color:var(--blue);text-decoration:none;padding:4px 9px;border:1px solid var(--border);border-radius:7px;background:var(--bg)" hidden>← AIOS / OKR</a>
+      <h2>实验室知识体系</h2>
+    </div>
+    <nav class="nb-views" id="nb-views" aria-label="展示界面"></nav>
+  </header>
+  <nav class="nb-mobile-tabs" aria-label="手机视图">
+    <button type="button" data-mobile="map">知识导图</button>
+    <button type="button" data-mobile="read">笔记与案例</button>
+  </nav>
+  <div class="nb-workspace">
+    <section class="nb-map-pane" aria-label="思维导图">
+      <div class="nb-map-stage" id="nb-stage">
+        <svg class="nb-map-edges" aria-hidden="true"><g id="nb-edges"></g></svg>
+        <div class="nb-map-plane" id="nb-plane"></div>
+      </div>
+      <div class="nb-map-tools">
+        <div class="nb-tool-group">
+          <button type="button" id="nb-zoom-out" aria-label="缩小导图">−</button>
+          <span id="nb-zoom" class="nb-small">100%</span>
+          <button type="button" id="nb-zoom-in" aria-label="放大导图">＋</button>
+        </div>
+        <button type="button" id="nb-overview">主干总览</button>
+        <button type="button" id="nb-expand">展开全部</button>
+        <input class="nb-search" id="nb-q" type="search" placeholder="搜索节点、笔记、案例">
+        <span class="nb-small" id="nb-qn">点节点写笔记/案例</span>
+        <span class="nb-legend">
+          <span><i class="ln"></i>已写笔记</span>
+          <span><i class="lc"></i>已写案例</span>
+        </span>
+      </div>
+    </section>
+
+    <button type="button" id="nb-width-resize" class="nb-resize nb-resize-width" role="separator" aria-orientation="vertical" aria-label="调整右栏宽度，左右方向键微调"></button>
+
+    <section class="nb-reader-pane" aria-label="笔记与案例演示">
+      <div class="nb-right-top">
+        <nav class="nb-read-tabs" aria-label="右栏切换">
+          <button type="button" data-read="note" aria-pressed="true">
+            <span>笔记</span><span class="nb-tab-count" id="nb-note-badge">空白</span>
+          </button>
+          <button type="button" data-read="case" aria-pressed="false">
+            <span>案例演示</span><span class="nb-tab-count" id="nb-case-badge">0</span>
+          </button>
+        </nav>
+        <div class="nb-top-actions">
+          <button type="button" class="nb-copy-ai" id="nb-copy-all" title="一键复制所有已写的笔记与案例，直接粘贴发给 AI 点评或美化">📋 复制已写给AI</button>
+          <button type="button" id="nb-font-dec" title="减小字号">A−</button>
+          <button type="button" id="nb-font-inc" title="增大字号">A+</button>
+          <button type="button" id="nb-export" title="导出全部笔记与案例备份 (.json)">导出</button>
+          <button type="button" id="nb-import" title="导入备份文件 (.json)">导入</button>
+          <input type="file" id="nb-import-file" accept=".json,application/json" hidden>
+        </div>
+      </div>
+
+      <div class="nb-node-bar">
+        <div class="nb-node-info">
+          <div class="nb-topic-path" id="nb-topic-path"></div>
+          <h3 id="nb-topic-title"></h3>
+        </div>
+        <div class="nb-node-meta">
+          <span class="nb-save-state" id="nb-save-state">实时自动保存</span>
+          <button type="button" class="nb-mode-btn" id="nb-preview-toggle" aria-pressed="false">预览排版</button>
+        </div>
+      </div>
+
+      <!-- Markdown 快捷格式与可视化工具栏 -->
+      <div class="nb-md-toolbar" id="nb-md-toolbar">
+        <button type="button" data-md="h2" title="插入二级加粗大标题">H2 标题</button>
+        <button type="button" data-md="h3" title="插入三级小节标题">H3 小节</button>
+        <button type="button" data-md="bold" title="加粗选中文字 (**文字**)"><b>B</b> 加粗</button>
+        <button type="button" data-md="mark" title="高亮标记 (==文字==)">高亮</button>
+        <button type="button" data-md="hr" title="插入水平分割线 (---)">— 分行线</button>
+        <button type="button" data-md="ul" title="插入无序列表 (- )">• 列表</button>
+        <button type="button" data-md="quote" title="插入重点提示框 (> )">💡 提示框</button>
+        <button type="button" data-md="tpl" title="插入【整体定义 / 原理解释 / Gate标准】标准学习框架">📐 插入框架</button>
+        <button type="button" class="nb-beautify" id="nb-beautify-btn" title="自动识别段落标题、加粗关键词、添加分行线并预览">✨ 一键美化排版</button>
+      </div>
+
+      <!-- 笔记面板 -->
+      <div class="nb-panel-body" id="nb-note-panel">
+        <div class="nb-editor-wrap">
+          <textarea class="nb-textarea" id="nb-note-input" placeholder="在此输入当前节点的个人笔记（支持上方工具栏一键插入标题、加粗、分行线，或写完点「✨ 一键美化排版」）…"></textarea>
+          <div class="nb-preview" id="nb-note-preview" hidden></div>
+        </div>
+      </div>
+
+      <!-- 案例演示面板 -->
+      <div class="nb-panel-body" id="nb-case-panel" hidden>
+        <div class="nb-editor-wrap">
+          <div class="nb-case-tabs" id="nb-case-tabs"></div>
+          <div class="nb-case-fields" id="nb-case-fields">
+            <input type="text" class="nb-input" id="nb-case-title-input" placeholder="案例标题（如：Ro52 UniProt P19474 标准序列锁定）">
+            <input type="text" class="nb-input" id="nb-case-tag-input" placeholder="分类（如：实战案例）">
+          </div>
+          <textarea class="nb-textarea" id="nb-case-body-input" placeholder="在此输入案例演示内容（背景、实验方案、关键数据、结论或防坑要点等，自动保存）…"></textarea>
+          <div class="nb-preview" id="nb-case-preview" hidden></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<script>
+const DATA=/*DATA*/{"tabs": [{"id": "iso", "label": "实验室 ISO 体系管理", "intro": "给管理者：质量体系现在什么状态、条款要求什么、该盯什么。", "tree": [{"t": "体系总览", "c": [{"t": "1. 体系现状一览", "id": "iso.0"}, {"t": "2. 三个先要看懂的矛盾", "id": "iso.1"}]}, {"t": "3. 条款地图（ISO 9001:2015 第 4–10 章）", "id": "iso.2"}, {"t": "文件、记录与审核", "c": [{"t": "4. 文件体系怎么读", "id": "iso.3"}, {"t": "5. 记录真实性：审核中最致命的一类", "id": "iso.4"}, {"t": "6. 审核准备清单（客户审核与监督审核）", "id": "iso.5"}, {"t": "7. 管理者可以问团队", "id": "iso.6"}, {"t": "8. 待确认", "id": "iso.7"}]}, {"t": "各工序的控制点与异常处理", "c": [{"t": "① 调研与立项", "st": 1, "c": [{"t": "Gate R1 四件套", "id": "s1.3"}, {"t": "待纠正与待统一", "id": "s1.8"}]}, {"t": "② 分子与材料设计", "st": 2, "c": [{"t": "Gate R2 四件套", "id": "s2.3"}, {"t": "待纠正", "id": "s2.8"}]}, {"t": "③ 构建与原料准备", "st": 3, "c": [{"t": "Gate R3 四件套", "id": "s3.3"}, {"t": "待纠正与待统一", "id": "s3.7"}]}, {"t": "④ 制备：扩增、表达或合成", "st": 4, "c": [{"t": "Gate R4 四件套", "id": "s4.3"}, {"t": "待纠正", "id": "s4.8"}]}, {"t": "⑤ 纯化与样品处理（可重复调用）", "st": 5, "c": [{"t": "Gate R5 四件套", "id": "s5.3"}, {"t": "待纠正", "id": "s5.8"}]}, {"t": "⑥ 组装、修饰与呈现", "st": 6, "c": [{"t": "Gate R6 四件套", "id": "s6.3"}, {"t": "待纠正", "id": "s6.8"}]}, {"t": "⑦ 质量与用途验证", "st": 7, "c": [{"t": "Gate R7 四件套", "id": "s7.3"}, {"t": "待纠正与待统一", "id": "s7.8"}]}, {"t": "⑧ 优化、稳定性与放大", "st": 8, "c": [{"t": "Gate R8 四件套", "id": "s8.3"}, {"t": "待纠正", "id": "s8.8"}]}, {"t": "⑨ 定型、放行与交付准备", "st": 9, "c": [{"t": "Gate R9 四件套", "id": "s9.3"}, {"t": "待纠正与待统一", "id": "s9.7"}]}, {"t": "⑩ 批生产与偏差", "st": 10, "c": [{"t": "流程与控制点", "id": "s10.2"}, {"t": "偏差与不合格", "id": "s10.3"}, {"t": "批号、批次关系与追溯", "id": "s10.4"}, {"t": "待统一的文件问题（摘自流转计划 §9 和本次核对）", "id": "s10.8"}]}, {"t": "⑪ 交付与客户反馈", "st": 11, "c": [{"t": "交付（PM-OP-005）", "id": "s11.2"}, {"t": "二方审核（客户审核）", "id": "s11.4"}, {"t": "满意度（SM-OP-002 §4.1–4.3）", "id": "s11.5"}]}, {"t": "⑫ CAPA 与变更", "st": 12, "c": [{"t": "CAPA 流程（QA-OP-009）", "id": "s12.2"}, {"t": "变更控制", "id": "s12.3"}]}]}, {"t": "待纠正汇总", "c": [{"t": "① 调研与立项", "c": [{"t": "待纠正与待统一", "id": "s1.8"}]}, {"t": "② 分子与材料设计", "c": [{"t": "待纠正", "id": "s2.8"}]}, {"t": "③ 构建与原料准备", "c": [{"t": "待纠正与待统一", "id": "s3.7"}]}, {"t": "④ 制备：扩增、表达或合成", "c": [{"t": "待纠正", "id": "s4.8"}]}, {"t": "⑤ 纯化与样品处理（可重复调用）", "c": [{"t": "待纠正", "id": "s5.8"}]}, {"t": "⑥ 组装、修饰与呈现", "c": [{"t": "待纠正", "id": "s6.8"}]}, {"t": "⑦ 质量与用途验证", "c": [{"t": "待纠正与待统一", "id": "s7.8"}]}, {"t": "⑧ 优化、稳定性与放大", "c": [{"t": "待纠正", "id": "s8.8"}]}, {"t": "⑨ 定型、放行与交付准备", "c": [{"t": "待纠正与待统一", "id": "s9.7"}]}, {"t": "⑩ 批生产与偏差", "c": [{"t": "待统一的文件问题（摘自流转计划 §9 和本次核对）", "id": "s10.8"}]}]}, {"t": "记录与数据完整性", "c": [{"t": "数据完整性 ALCOA+", "id": "x.1"}, {"t": "5. 数据完整性：系统层规则", "id": "lb.4"}]}]}, {"id": "learn", "label": "基础知识学习", "intro": "全流程知识导图（沿用 Gemini 版结构），分支末尾是 Gate 关口；在右栏记录个人笔记与案例演示。", "tree": [{"t": "State-of-the-Art前沿调研", "bi": 1, "c": [{"t": "靶点与结构特征分析", "c": [{"t": "氨基酸序列获取: UniProt数据库标准序列"}, {"t": "蛋白质结构解析: 一至四级结构评估"}, {"t": "翻译后修饰评估: 糖基化与磷酸化位点"}]}, {"t": "文献与策略锚定", "c": [{"t": "同靶点顶刊方案检索与前人经验"}, {"t": "包涵体与低活性规避策略"}, {"t": "融合标签与表达宿主选择"}]}, {"t": "Gate｜① 调研与立项", "id": "s1.3"}]}, {"t": "DNA设计与基因构建", "bi": 2, "c": [{"t": "密码子优化与表达元件", "c": [{"t": "密码子偏好性适配表达宿主"}, {"t": "启动子选择: 弱启动子防止过快聚集"}, {"t": "载体骨架匹配: pET系列专用质粒"}]}, {"t": "标签与酶切位点设计", "c": [{"t": "助溶与亲和标签: MBP-6xHis双标签"}, {"t": "蛋白酶切位点: TEV或凝血酶切位点"}, {"t": "柔性连接肽: 15-25个氨基酸Linker"}]}, {"t": "工程化突变改造方案", "c": [{"t": "疏水片段定点突变与序列替换"}, {"t": "全长与截短体筛选策略"}, {"t": "嵌合表位抗原串联设计"}]}, {"t": "Gate｜② 分子与材料设计", "id": "s2.3"}, {"t": "Gate｜③ 构建与原料准备", "id": "s3.3"}]}, {"t": "上游发酵与表达系统", "bi": 3, "c": [{"t": "表达宿主系统筛选", "c": [{"t": "大肠杆菌系统: Rosetta(DE3)低温保溶"}, {"t": "哺乳动物细胞: CHO/293T天然修饰"}, {"t": "无细胞蛋白质合成: CFPS快速合成系统"}]}, {"t": "小试诱导工艺优化", "c": [{"t": "诱导温度控制: 16°C至20°C低温防包涵体"}, {"t": "诱导剂浓度: 0.1-0.2mM低浓度IPTG"}, {"t": "金属离子添加: 微量ZnCl2稳定锌指结构"}]}, {"t": "可溶性与包涵体评估", "c": [{"t": "细胞裂解与高速离心分离"}, {"t": "上清液可溶性表达检测"}, {"t": "SDS-PAGE电泳初步鉴定"}]}, {"t": "Gate｜④ 制备：扩增、表达或合成", "id": "s4.3"}]}, {"t": "下游分离与纯化技术", "bi": 4, "c": [{"t": "亲和层析捕获种类", "c": [{"t": "Protein A/G色谱: 捕获IgG抗体Fc区"}, {"t": "Ni-NTA树脂: 纯化多组氨酸标签蛋白"}, {"t": "直链淀粉树脂: Amylose抓取MBP融合蛋白"}, {"t": "生物素化靶点: Streptavidin亲和介质"}]}, {"t": "理化分离与精纯色谱", "c": [{"t": "离子交换色谱IEX: 依据电荷去除杂质"}, {"t": "凝胶过滤色谱SEC: 依据分子量分离二聚体"}, {"t": "疏水作用层析HIC: 去除构象异质体"}]}, {"t": "病毒灭活与缓冲液置换", "c": [{"t": "低pH洗脱与病毒灭活处理"}, {"t": "超滤透析进行缓冲液置换"}, {"t": "超滤浓缩与蛋白分装储存"}]}, {"t": "Gate｜⑤ 纯化与样品处理（可重复调用）", "id": "s5.3"}]}, {"t": "质量控制QC与活性评估", "bi": 5, "c": [{"t": "理化质控指标检测", "c": [{"t": "纯度测定:考马斯亮蓝与SDS-PAGE"}, {"t": "聚体分析: SEC-HPLC评估二聚体比例"}, {"t": "浓度与内毒素测定: BCA法与低内毒素控制"}]}, {"t": "功能活性与血清学验证", "c": [{"t": "体外酶活测定: 泛素化或酶催化活性验证"}, {"t": "结合特异性测定: ELISA或SPR/BLI分析"}, {"t": "临床血清学评估: 阳性与阴性参考血清测试"}]}, {"t": "批次稳定性测试", "c": [{"t": "4°C冷藏与反复冻融耐受评估"}, {"t": "长期保存条件与降解监测"}]}, {"t": "Gate｜⑦ 质量与用途验证", "id": "s7.3"}]}]}, {"id": "labos", "label": "LabOS 开发指导", "intro": "给 LabOS 设计：现状观察、字段、系统校验、签核、优先级。", "tree": [{"t": "总表：现状、规则、优先级", "c": [{"t": "1. LabOS 现状观察", "id": "lb.0"}, {"t": "2. 质量状态规则（⑩ 的核心）", "id": "lb.1"}, {"t": "3. 角色与签核", "id": "lb.2"}, {"t": "4. 缺口与优先级（建议）", "id": "lb.3"}, {"t": "5. 数据完整性：系统层规则", "id": "lb.4"}, {"t": "6. 待确认", "id": "lb.5"}]}, {"t": "设计与研发：对象、字段与校验", "c": [{"t": "① 调研与立项", "st": 1, "c": [{"t": "Gate R1 四件套", "id": "s1.3"}, {"t": "LabOS 落点", "id": "s1.7"}, {"t": "LabOS 设计", "id": "s1.lab"}]}, {"t": "② 分子与材料设计", "st": 2, "c": [{"t": "Gate R2 四件套", "id": "s2.3"}, {"t": "LabOS 落点（建议）", "id": "s2.7"}, {"t": "LabOS 设计", "id": "s2.lab"}]}, {"t": "③ 构建与原料准备", "st": 3, "c": [{"t": "Gate R3 四件套", "id": "s3.3"}, {"t": "LabOS 落点（建议）", "id": "s3.6"}, {"t": "LabOS 设计", "id": "s3.lab"}]}, {"t": "④ 制备：扩增、表达或合成", "st": 4, "c": [{"t": "Gate R4 四件套", "id": "s4.3"}, {"t": "LabOS 落点（建议）", "id": "s4.7"}, {"t": "LabOS 设计", "id": "s4.lab"}]}, {"t": "⑤ 纯化与样品处理（可重复调用）", "st": 5, "c": [{"t": "Gate R5 四件套", "id": "s5.3"}, {"t": "LabOS 落点（建议）", "id": "s5.7"}, {"t": "LabOS 设计", "id": "s5.lab"}]}, {"t": "⑥ 组装、修饰与呈现", "st": 6, "c": [{"t": "Gate R6 四件套", "id": "s6.3"}, {"t": "LabOS 落点（建议）", "id": "s6.7"}, {"t": "LabOS 设计", "id": "s6.lab"}]}]}, {"t": "验证与定型：对象、字段与校验", "c": [{"t": "⑦ 质量与用途验证", "st": 7, "c": [{"t": "Gate R7 四件套", "id": "s7.3"}, {"t": "LabOS 落点（建议）", "id": "s7.7"}, {"t": "LabOS 设计", "id": "s7.lab"}]}, {"t": "⑧ 优化、稳定性与放大", "st": 8, "c": [{"t": "Gate R8 四件套", "id": "s8.3"}, {"t": "LabOS 落点（建议）", "id": "s8.7"}, {"t": "LabOS 设计", "id": "s8.lab"}]}, {"t": "⑨ 定型、放行与交付准备", "st": 9, "c": [{"t": "Gate R9 四件套", "id": "s9.3"}, {"t": "LabOS 落点（建议）", "id": "s9.6"}, {"t": "LabOS 设计", "id": "s9.lab"}]}]}, {"t": "生产 · 市场 · 改进：对象、字段与校验", "c": [{"t": "⑩ 批生产与偏差", "st": 10, "c": [{"t": "LabOS 落点", "id": "s10.7"}, {"t": "LabOS 设计", "id": "s10.lab"}]}, {"t": "⑪ 交付与客户反馈", "st": 11, "c": [{"t": "LabOS 落点（建议新增\"客户反馈\"模块）", "id": "s11.8"}, {"t": "LabOS 设计", "id": "s11.lab"}]}, {"t": "⑫ CAPA 与变更", "st": 12, "c": [{"t": "LabOS 落点（建议新增\"CAPA/变更\"模块）", "id": "s12.6"}, {"t": "LabOS 设计", "id": "s12.lab"}]}]}, {"t": "相关体系条款", "c": [{"t": "3. 条款地图（ISO 9001:2015 第 4–10 章）", "id": "iso.2"}]}]}]}/*ENDDATA*/;
+(function(){
+const root=document.getElementById("nb"),$=id=>document.getElementById(id);
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const clamp=(v,a,b,f)=>Number.isFinite(+v)?Math.max(a,Math.min(b,+v)):f;
+const {tabs}=DATA,byKey={};
+
+tabs.forEach(t=>{
+  t.root={t:t.label,c:t.tree};
+  (function walk(n,k,par,d){
+    n._k=k;n._par=par;n._d=d;byKey[k]=n;
+    (n.c||[]).forEach((c,i)=>walk(c,k+"."+i,n,d+1));
+  })(t.root,t.id,null,0);
+  t.open=new Set();
+  (t.root.c||[]).forEach(c=>{if(c.c&&c.c.length)t.open.add(c._k)});
+});
+
+/* 偏好与用户笔记存储 */
+const PREF_KEY="labkb-pref";
+const STORE_KEY="labkb-user-notes-v1";
+let pref={font:15,rw:500};
+try{Object.assign(pref,JSON.parse(localStorage.getItem(PREF_KEY)||"{}"))}catch(e){}
+const savePref=()=>{try{localStorage.setItem(PREF_KEY,JSON.stringify(pref))}catch(e){}};
+
+let store={};
+try{store=JSON.parse(localStorage.getItem(STORE_KEY)||"{}")||{}}catch(e){store={}}
+
+/* 合并 AI 同步数据文件 (笔记与案例_同步数据.js) */
+if(window.LABKB_SYNC_DATA&&typeof window.LABKB_SYNC_DATA==="object"){
+  let changed=false;
+  Object.keys(window.LABKB_SYNC_DATA).forEach(k=>{
+    const incoming=window.LABKB_SYNC_DATA[k];
+    if(!incoming||typeof incoming!=="object")return;
+    const existing=store[k];
+    if(!existing||(incoming.updatedAt&&(!existing.updatedAt||incoming.updatedAt>existing.updatedAt))){
+      store[k]=incoming;
+      changed=true;
+    }
+  });
+  if(changed){
+    try{localStorage.setItem(STORE_KEY,JSON.stringify(store))}catch(e){}
+  }
+}
+
+function ancestors(n){const a=[];for(let p=n._par;p;p=p._par)a.unshift(p);return a}
+function nodePathKey(n){
+  const tabId=n._k.split(".")[0];
+  return tabId+"::"+[...ancestors(n).map(p=>p.t),n.t].join("/");
+}
+function getEntry(n){
+  if(!n)return {note:"",cases:[]};
+  const pk=nodePathKey(n);
+  const raw=store[n._k]||store[pk];
+  if(!raw)return {note:"",cases:[]};
+  return {
+    note:typeof raw.note==="string"?raw.note:"",
+    cases:Array.isArray(raw.cases)?raw.cases.map(c=>({title:c.title||"",tag:c.tag||"",body:c.body||""})):[]
+  };
+}
+function hasNote(n){
+  const e=getEntry(n);
+  return e.note.trim().length>0;
+}
+function validCases(e){
+  return (e.cases||[]).filter(c=>(c.title&&c.title.trim())||(c.tag&&c.tag.trim())||(c.body&&c.body.trim()));
+}
+function caseCount(n){
+  return validCases(getEntry(n)).length;
+}
+function setEntry(n,entry){
+  if(!n)return;
+  const pk=nodePathKey(n);
+  const cleanCases=(entry.cases||[]).map(c=>({title:c.title||"",tag:c.tag||"",body:c.body||""}));
+  const hasAny=(entry.note&&entry.note.trim())||cleanCases.some(c=>c.title.trim()||c.tag.trim()||c.body.trim());
+  if(hasAny){
+    const rec={
+      key:n._k,
+      path:[...ancestors(n).map(p=>p.t),n.t].join(" / "),
+      title:n.t,
+      note:entry.note||"",
+      cases:cleanCases,
+      updatedAt:new Date().toISOString()
+    };
+    store[n._k]=rec;
+    store[pk]=rec;
+  }else{
+    delete store[n._k];
+    delete store[pk];
+  }
+  try{
+    localStorage.setItem(STORE_KEY,JSON.stringify(store));
+    const now=new Date();
+    const ts=[now.getHours(),now.getMinutes(),now.getSeconds()].map(x=>String(x).padStart(2,"0")).join(":");
+    $("nb-save-state").textContent="已保存 "+ts;
+    $("nb-save-state").classList.add("saved");
+  }catch(e){
+    $("nb-save-state").textContent="保存失败（存储空间不足）";
+    $("nb-save-state").classList.remove("saved");
+  }
+  scheduleServerSync();
+  updateBadges();
+  updateNodeBadgeInMap(n);
+}
+
+/* AIOS 本地服务端实时落盘同步 (/api/lab-kb-notes) */
+const isLocalApi=/^https?:$/i.test(location.protocol)&&(location.hostname==="127.0.0.1"||location.hostname==="localhost");
+if(isLocalApi){
+  const backBtn=$("nb-back-okr");
+  if(backBtn)backBtn.hidden=false;
+  fetch("/api/lab-kb-notes").then(r=>r.json()).then(res=>{
+    if(res&&res.ok&&res.data&&typeof res.data==="object"){
+      let changed=false;
+      Object.keys(res.data).forEach(k=>{
+        const inc=res.data[k];
+        if(!inc||typeof inc!=="object")return;
+        const ex=store[k];
+        if(!ex||(inc.updatedAt&&(!ex.updatedAt||inc.updatedAt>ex.updatedAt))){
+          store[k]=inc;changed=true;
+        }
+      });
+      if(changed){
+        try{localStorage.setItem(STORE_KEY,JSON.stringify(store))}catch(e){}
+        renderMap(true);
+        renderRightPane();
+      }
+      if(Object.keys(store).length){
+        fetch("/api/lab-kb-notes",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({data:store})}).catch(()=>{});
+      }
+    }
+  }).catch(()=>{});
+}
+let syncTimer=null;
+function scheduleServerSync(){
+  if(!isLocalApi)return;
+  if(syncTimer)clearTimeout(syncTimer);
+  syncTimer=setTimeout(()=>{
+    fetch("/api/lab-kb-notes",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({data:store})
+    }).then(r=>r.json()).then(res=>{
+      if(res&&res.ok){
+        const now=new Date();
+        const ts=[now.getHours(),now.getMinutes(),now.getSeconds()].map(x=>String(x).padStart(2,"0")).join(":");
+        $("nb-save-state").textContent="已同步落盘 "+ts;
+        $("nb-save-state").classList.add("saved");
+      }
+    }).catch(()=>{});
+  },300);
+}
+
+let tab=null,cur=null,readMode="note",previewMode=false,activeCaseIdx=0,hits=[],hitI=-1;
+let items=[],totalW=0,totalH=0,view={x:0,y:0,scale:1};
+const stage=$("nb-stage"),plane=$("nb-plane"),edges=$("nb-edges");
+const kind=n=>n===tab.root?"root":/Gate|G\d/.test(n.t)?"gate":(n.c&&n.c.length)?"group":"leaf";
+
+/* 布局与字号 */
+function layout(){
+  const w=Math.max(300,root.clientWidth-268),rw=Math.min(pref.rw,w);
+  const s=document.documentElement.style;
+  s.setProperty("--rf",pref.font+"px");
+  s.setProperty("--rw",rw+"px");
+}
+function bindResize(){
+  const h=$("nb-width-resize");let on=false;
+  h.addEventListener("pointerdown",e=>{if(e.button!==0)return;on=true;h.setPointerCapture(e.pointerId);e.preventDefault()});
+  h.addEventListener("pointermove",e=>{
+    if(!on)return;
+    const b=root.getBoundingClientRect();
+    pref.rw=clamp(b.right-e.clientX,320,Math.max(320,b.width-268),500);
+    layout();
+  });
+  const done=()=>{if(on){on=false;savePref()}};
+  h.addEventListener("pointerup",done);h.addEventListener("pointercancel",done);
+  h.addEventListener("keydown",e=>{
+    if(!["ArrowLeft","ArrowRight"].includes(e.key))return;
+    e.preventDefault();
+    pref.rw=clamp(pref.rw+(e.key==="ArrowLeft"?24:-24),320,Math.max(320,root.clientWidth-268),500);
+    layout();savePref();
+  });
+}
+bindResize();
+$("nb-font-dec").onclick=()=>{pref.font=clamp(pref.font-1,13,22,15);layout();savePref()};
+$("nb-font-inc").onclick=()=>{pref.font=clamp(pref.font+1,13,22,15);layout();savePref()};
+
+/* 增强版 Markdown 渲染（支持加粗标题、--- 分行线、==高亮==、【标签】、冒号前自动加粗） */
+function renderMarkdown(md){
+  if(!md||!md.trim())return '<p class="nb-empty">暂无内容，点击右上角「返回编辑」开始编写。</p>';
+  const lines=md.replace(/\r\n/g,"\n").split("\n");
+  const out=[];
+  let i=0;
+  function inlineFmt(s){
+    let t=esc(s);
+    t=t.replace(/`([^`]+)`/g,"<code>$1</code>");
+    t=t.replace(/==(.+?)==/g,"<mark>$1</mark>");
+    t=t.replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>");
+    t=t.replace(/\*(.+?)\*/g,"<em>$1</em>");
+    t=t.replace(/【([^】]+)】/g,'<span class="nb-tag-chip">$1</span>');
+    // 行首「关键词：」若未加粗则自动加粗冒号前短词
+    t=t.replace(/^([A-Za-z0-9\u4e00-\u9fa5（）()／/·\-]{2,14})([：:])/,"<strong>$1$2</strong>");
+    return t;
+  }
+  while(i<lines.length){
+    const ln=lines[i];
+    if(!ln.trim()){i++;continue}
+    if(/^(\s*[-*_]\s*){3,}$/.test(ln)){
+      out.push('<hr class="nb-hr">');
+      i++;continue;
+    }
+    if(ln.startsWith("```")){
+      const code=[];i++;
+      while(i<lines.length&&!lines[i].startsWith("```")){code.push(esc(lines[i]));i++}
+      i++;
+      out.push("<pre><code>"+code.join("\n")+"</code></pre>");
+      continue;
+    }
+    const hm=ln.match(/^(#{1,4})\s+(.+)/);
+    if(hm){
+      const lv=hm[1].length;
+      out.push(`<h${lv}>${inlineFmt(hm[2])}</h${lv}>`);
+      i++;continue;
+    }
+    if(ln.startsWith(">")){
+      const q=[];
+      while(i<lines.length&&lines[i].startsWith(">")){q.push(inlineFmt(lines[i].replace(/^>\s?/,"")));i++}
+      out.push("<blockquote>"+q.join("<br>")+"</blockquote>");
+      continue;
+    }
+    if(ln.startsWith("|")){
+      const rows=[];
+      while(i<lines.length&&lines[i].startsWith("|")){
+        rows.push(lines[i].trim().replace(/^\||\|$/g,"").split("|").map(c=>c.trim()));
+        i++;
+      }
+      if(rows.length){
+        const head=rows[0];
+        const body=rows.slice(1).filter(r=>!r.every(c=>/^:?-+:?$/.test(c)));
+        out.push("<table><thead><tr>"+head.map(c=>`<th>${inlineFmt(c)}</th>`).join("")+"</tr></thead><tbody>"+
+          body.map(r=>"<tr>"+r.map(c=>`<td>${inlineFmt(c)}</td>`).join("")+"</tr>").join("")+"</tbody></table>");
+      }
+      continue;
+    }
+    if(/^\s*([-*•]|\d+[.、])\s+/.test(ln)){
+      const isOl=/^\s*\d+[.、]\s+/.test(ln);
+      const tag=isOl?"ol":"ul";
+      const lis=[];
+      while(i<lines.length&&/^\s*([-*•]|\d+[.、])\s+/.test(lines[i])){
+        lis.push("<li>"+inlineFmt(lines[i].replace(/^\s*([-*•]|\d+[.、])\s+/,""))+"</li>");
+        i++;
+      }
+      out.push(`<${tag}>`+lis.join("")+`</${tag}>`);
+      continue;
+    }
+    const p=[];
+    while(i<lines.length&&lines[i].trim()&&!/^(\s*[-*_]\s*){3,}$/.test(lines[i])&&!lines[i].startsWith("#")&&!lines[i].startsWith(">")&&!lines[i].startsWith("|")&&!lines[i].startsWith("```")&&!/^\s*([-*•]|\d+[.、])\s+/.test(lines[i])){
+      p.push(inlineFmt(lines[i]));i++;
+    }
+    out.push("<p>"+p.join("<br>")+"</p>");
+  }
+  return out.join("");
+}
+
+/* ✨ 一键自动美化 Markdown 语法函数 */
+function beautifyMarkdownText(raw){
+  if(!raw||!raw.trim())return raw;
+  const lines=raw.replace(/\r\n/g,"\n").split("\n");
+  const res=[];
+  const secPat=/^(?:[一二三四五六七八九十]+[、.．]\s*|\d+[.、．]\s*)?(整体定义|核心定义|定义|原理解释|核心原理|原理|Gate\s*标准|Gate|放行标准|质量控制|QC|结合案例|实战案例|案例演示|案例|防错要点|踩坑点|注意事项|总结|结论)\s*[：:]?\s*(.*)$/i;
+  for(let i=0;i<lines.length;i++){
+    let ln=lines[i].trimEnd();
+    if(!ln.trim()){
+      res.push("");
+      continue;
+    }
+    // 已经是分割线或标题则保留
+    if(/^(\s*[-*_]\s*){3,}$/.test(ln)||ln.startsWith("#")){
+      res.push(ln);
+      continue;
+    }
+    // 识别「整体定义 / 原理解释 / Gate 标准 / 案例」等模块行，自动加分割线与 H2 加粗标题
+    const sm=ln.trim().match(secPat);
+    if(sm){
+      if(res.length&&res[res.length-1]!=="---"&&res.some(x=>x.trim())){
+        if(res[res.length-1]!=="")res.push("");
+        res.push("---");
+        res.push("");
+      }
+      res.push(`## **${sm[1].trim()}**`);
+      if(sm[2]&&sm[2].trim()){
+        res.push(`- ${sm[2].trim()}`);
+      }
+      continue;
+    }
+    // 识别「xxx：yyy」结构自动转为列表 + 冒号前加粗
+    const kv=ln.trim().match(/^([-*•]?\s*)([A-Za-z0-9\u4e00-\u9fa5（）()／/·\s]{2,14})([：:])\s*(.+)$/);
+    if(kv&&!kv[2].includes("**")){
+      res.push(`- **${kv[2].trim()}**${kv[3]} ${kv[4]}`);
+      continue;
+    }
+    res.push(ln);
+  }
+  return res.join("\n").replace(/\n{3,}/g,"\n\n");
+}
+
+/* 导图绘制 */
+function collect(n,depth,parent){
+  const it={n,depth,parent,children:[]};
+  items.push(it);
+  if(n===tab.root||tab.open.has(n._k))it.children=(n.c||[]).map(c=>collect(c,depth+1,it));
+  return it;
+}
+function buildNodeBadgeHtml(n){
+  const hn=hasNote(n),hc=caseCount(n)>0;
+  if(!hn&&!hc)return "";
+  return `<span class="nb-node-badges">${hn?'<i class="nb-badge-dot nb-badge-note" title="已写笔记"></i>':""}${hc?'<i class="nb-badge-dot nb-badge-case" title="已写案例"></i>':""}</span>`;
+}
+function updateNodeBadgeInMap(n){
+  if(!n)return;
+  const btn=plane.querySelector(`[data-k="${CSS.escape(n._k)}"]`);
+  if(!btn)return;
+  btn.innerHTML=esc(n.t)+buildNodeBadgeHtml(n);
+}
+function makeNode(it){
+  const n=it.n,k=kind(n),wrap=document.createElement("div");wrap.className="nb-node";
+  const b=document.createElement("button");b.type="button";
+  b.className="nb-node-button d"+Math.min(it.depth,3)+(k==="root"?" nb-node-root":k==="gate"?" nb-node-gate":"")+(hits.includes(n)?" nb-hit":"");
+  b.innerHTML=esc(n.t)+buildNodeBadgeHtml(n);
+  b.dataset.k=n._k;b.setAttribute("aria-pressed",String(n===cur));
+  b.addEventListener("click",()=>select(n));wrap.append(b);
+  if(n.c&&n.c.length&&k!=="root"){
+    const op=tab.open.has(n._k),t=document.createElement("button");t.type="button";t.className="nb-node-toggle";
+    t.textContent=op?"‹":"›";t.title=(op?"收起":"展开")+"（"+n.c.length+" 项）";t.setAttribute("aria-label",(op?"收起":"展开")+n.t);t.setAttribute("aria-expanded",String(op));
+    t.addEventListener("click",()=>{op?tab.open.delete(n._k):tab.open.add(n._k);renderMap(true);reveal(n,true);const f=plane.querySelector(`[data-x="${CSS.escape(n._k)}"]`);if(f)f.focus({preventScroll:true})});
+    t.dataset.x=n._k;wrap.append(t);
+  }
+  plane.append(wrap);it.el=wrap;
+}
+function applyView(){
+  plane.style.transform=`translate(${view.x}px,${view.y}px) scale(${view.scale})`;
+  edges.setAttribute("transform",`translate(${view.x} ${view.y}) scale(${view.scale})`);
+  $("nb-zoom").textContent=Math.round(view.scale*100)+"%";
+  $("nb-zoom-out").disabled=view.scale<=.5;
+  $("nb-zoom-in").disabled=view.scale>=1.6;
+}
+function fit(){
+  const w=stage.clientWidth,h=stage.clientHeight;
+  view.scale=Math.max(.85,Math.min(1,(w-24)/totalW,(h-24)/totalH));
+  view.x=totalW*view.scale>w-24?12:(w-totalW*view.scale)/2;
+  if(totalH*view.scale>h-24){
+    const r=items[0];
+    view.y=r?h/2-(r.y+r.h/2)*view.scale:12;
+    view.y=Math.min(12,view.y);
+  }else view.y=(h-totalH*view.scale)/2;
+  applyView();
+}
+function reveal(n,withKids){
+  const it=items.find(i=>i.n===n);if(!it)return;
+  const arr=withKids?[it,...it.children]:[it];
+  const l=Math.min(...arr.map(a=>a.x))*view.scale,r=Math.max(...arr.map(a=>a.x+a.w))*view.scale,t=Math.min(...arr.map(a=>a.y))*view.scale,b=Math.max(...arr.map(a=>a.y+a.h))*view.scale,w=stage.clientWidth,h=stage.clientHeight,m=12;
+  if(r-l<w-2*m){if(r+view.x>w-m)view.x=w-m-r;if(l+view.x<m)view.x=m-l}else view.x=m-it.x*view.scale;
+  if(b-t<h-2*m){if(b+view.y>h-m)view.y=h-m-b;if(t+view.y<m)view.y=m-t}else view.y=h/2-(it.y+it.h/2)*view.scale;
+  applyView();
+}
+function markActive(){
+  if(!cur)return;
+  plane.querySelectorAll("[data-k]").forEach(b=>b.setAttribute("aria-pressed",String(byKey[b.dataset.k]===cur)));
+  const anc=new Set([cur,...ancestors(cur)].map(n=>n._k));
+  edges.querySelectorAll("path").forEach(p=>p.classList.toggle("nb-active",anc.has(p.dataset.to)));
+}
+function renderMap(keepView){
+  if(!stage.clientWidth)return;
+  items=[];const top=collect(tab.root,0,null);plane.replaceChildren();edges.replaceChildren();items.forEach(makeNode);
+  const widths=[];for(const it of items){it.w=it.el.offsetWidth;it.h=it.el.offsetHeight;widths[it.depth]=Math.max(widths[it.depth]||0,it.w)}
+  const gap=stage.clientWidth<440?24:32,xs=[0];widths.forEach((w,i)=>xs[i+1]=xs[i]+w+gap);
+  let y=0;
+  (function pos(it){
+    it.x=xs[it.depth];
+    if(it.children.length){it.children.forEach(pos);it.cy=(it.children[0].cy+it.children[it.children.length-1].cy)/2}
+    else{it.cy=y+it.h/2+6;y+=it.h+12}
+    it.y=it.cy-it.h/2;it.el.style.left=it.x+"px";it.el.style.top=it.y+"px";
+  })(top);
+  totalW=Math.max(...items.map(i=>i.x+i.w));totalH=Math.max(...items.map(i=>i.y+i.h))+12;
+  for(const it of items)if(it.parent){
+    const a=it.parent,x1=a.x+a.w,y1=a.cy,x2=it.x,y2=it.cy,mx=(x1+x2)/2,p=document.createElementNS("http://www.w3.org/2000/svg","path");
+    p.setAttribute("d",`M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`);
+    p.dataset.to=it.n._k;edges.append(p);
+  }
+  markActive();
+  if(!keepView){fit();if(cur&&cur!==tab.root)reveal(cur,false)}else applyView();
+}
+function zoom(d){
+  const nx=Math.max(.5,Math.min(1.6,Math.round((view.scale+d)*100)/100)),cx=stage.clientWidth/2,cy=stage.clientHeight/2;
+  view.x=cx-(cx-view.x)*nx/view.scale;view.y=cy-(cy-view.y)*nx/view.scale;view.scale=nx;applyView();
+}
+$("nb-zoom-out").onclick=()=>zoom(-.1);
+$("nb-zoom-in").onclick=()=>zoom(.1);
+$("nb-overview").onclick=()=>{tab.open=new Set();(tab.root.c||[]).forEach(c=>{if(c.c&&c.c.length)tab.open.add(c._k)});select(tab.root)};
+$("nb-expand").onclick=()=>{(function f(n){if(n.c&&n.c.length){tab.open.add(n._k);n.c.forEach(f)}})(tab.root);renderMap()};
+
+let drag=null;
+stage.addEventListener("pointerdown",e=>{if(e.target.closest("button")||e.button!==0)return;drag={x:e.clientX,y:e.clientY,ox:view.x,oy:view.y};stage.setPointerCapture(e.pointerId);stage.classList.add("nb-dragging")});
+stage.addEventListener("pointermove",e=>{if(!drag)return;view.x=Math.max(40-totalW*view.scale,Math.min(stage.clientWidth-40,drag.ox+e.clientX-drag.x));view.y=Math.max(40-totalH*view.scale,Math.min(stage.clientHeight-40,drag.oy+e.clientY-drag.y));applyView()});
+const stop=()=>{drag=null;stage.classList.remove("nb-dragging")};stage.addEventListener("pointerup",stop);stage.addEventListener("pointercancel",stop);
+stage.addEventListener("wheel",e=>{e.preventDefault();if(e.ctrlKey||e.metaKey)zoom(e.deltaY<0?.1:-.1);else{view.x-=e.deltaX;view.y-=e.deltaY;applyView()}},{passive:false});
+
+/* 右栏：笔记与案例演示渲染与编辑 */
+function updateBadges(){
+  if(!cur)return;
+  const e=getEntry(cur);
+  const hn=e.note.trim().length>0;
+  const cc=validCases(e).length;
+  $("nb-note-badge").textContent=hn?"已写":"空白";
+  $("nb-case-badge").textContent=String(cc);
+}
+
+function renderRightPane(){
+  if(!cur)return;
+  const pathStr=ancestors(cur).map(p=>p.t).join(" / ")||tab.label;
+  $("nb-topic-path").textContent=pathStr;
+  $("nb-topic-title").textContent=cur.t;
+
+  const entry=getEntry(cur);
+  updateBadges();
+
+  // 笔记内容
+  $("nb-note-input").value=entry.note;
+  if(previewMode){
+    $("nb-note-input").hidden=true;
+    $("nb-note-preview").hidden=false;
+    $("nb-note-preview").innerHTML=renderMarkdown(entry.note);
+  }else{
+    $("nb-note-input").hidden=false;
+    $("nb-note-preview").hidden=true;
+  }
+
+  // 案例演示内容
+  const cases=entry.cases.length?entry.cases:[{title:"",tag:"",body:""}];
+  if(activeCaseIdx>=cases.length)activeCaseIdx=Math.max(0,cases.length-1);
+  const curCase=cases[activeCaseIdx]||{title:"",tag:"",body:""};
+
+  $("nb-case-tabs").innerHTML=cases.map((c,idx)=>{
+    const label=c.title.trim()?c.title.trim():`案例 ${idx+1}`;
+    return `<button type="button" class="nb-case-pill" data-cidx="${idx}" aria-pressed="${idx===activeCaseIdx}">${esc(label)}</button>`;
+  }).join("")+
+  `<button type="button" class="nb-case-add" id="nb-case-add-btn">＋ 新增案例</button>`+
+  (cases.length>1||(curCase.title.trim()||curCase.tag.trim()||curCase.body.trim())?`<button type="button" class="nb-case-del" id="nb-case-del-btn">删除当前案例</button>`:"");
+
+  $("nb-case-title-input").value=curCase.title;
+  $("nb-case-tag-input").value=curCase.tag;
+  $("nb-case-body-input").value=curCase.body;
+
+  if(previewMode){
+    $("nb-case-fields").hidden=true;
+    $("nb-case-body-input").hidden=true;
+    $("nb-case-preview").hidden=false;
+    const headMd=(curCase.title?`## **${curCase.title}**\n`:"")+(curCase.tag?`> **分类**：${curCase.tag}\n\n---\n\n`:"");
+    $("nb-case-preview").innerHTML=renderMarkdown(headMd+(curCase.body||""));
+  }else{
+    $("nb-case-fields").hidden=false;
+    $("nb-case-body-input").hidden=false;
+    $("nb-case-preview").hidden=true;
+  }
+}
+
+/* 监听笔记输入 */
+$("nb-note-input").addEventListener("input",()=>{
+  if(!cur)return;
+  const entry=getEntry(cur);
+  entry.note=$("nb-note-input").value;
+  setEntry(cur,entry);
+});
+
+/* 监听案例输入 */
+function onCaseInput(){
+  if(!cur)return;
+  const entry=getEntry(cur);
+  if(!entry.cases.length)entry.cases=[{title:"",tag:"",body:""}];
+  while(entry.cases.length<=activeCaseIdx)entry.cases.push({title:"",tag:"",body:""});
+  entry.cases[activeCaseIdx]={
+    title:$("nb-case-title-input").value,
+    tag:$("nb-case-tag-input").value,
+    body:$("nb-case-body-input").value
+  };
+  setEntry(cur,entry);
+  const pill=$("nb-case-tabs").querySelector(`[data-cidx="${activeCaseIdx}"]`);
+  if(pill){
+    const t=$("nb-case-title-input").value.trim();
+    pill.textContent=t||`案例 ${activeCaseIdx+1}`;
+  }
+}
+$("nb-case-title-input").addEventListener("input",onCaseInput);
+$("nb-case-tag-input").addEventListener("input",onCaseInput);
+$("nb-case-body-input").addEventListener("input",onCaseInput);
+
+/* Markdown 快捷工具栏操作 */
+function activeTextarea(){
+  return readMode==="note"?$("nb-note-input"):$("nb-case-body-input");
+}
+function insertAtCursor(ta,prefix,suffix="",defaultText=""){
+  if(previewMode)setPreview(false);
+  ta.focus();
+  const s=ta.selectionStart,e=ta.selectionEnd;
+  const sel=ta.value.substring(s,e)||defaultText;
+  const rep=prefix+sel+suffix;
+  ta.value=ta.value.substring(0,s)+rep+ta.value.substring(e);
+  ta.selectionStart=s+prefix.length;
+  ta.selectionEnd=s+prefix.length+sel.length;
+  ta.dispatchEvent(new Event("input"));
+}
+$("nb-md-toolbar").addEventListener("click",e=>{
+  const btn=e.target.closest("[data-md]");
+  if(!btn)return;
+  const act=btn.dataset.md;
+  const ta=activeTextarea();
+  if(act==="h2")insertAtCursor(ta,"\n## **","**\n","标题");
+  else if(act==="h3")insertAtCursor(ta,"\n### **","**\n","小节标题");
+  else if(act==="bold")insertAtCursor(ta,"**","**","重点文字");
+  else if(act==="mark")insertAtCursor(ta,"==","==","高亮内容");
+  else if(act==="hr")insertAtCursor(ta,"\n\n---\n\n","","");
+  else if(act==="ul")insertAtCursor(ta,"\n- ","","列表项");
+  else if(act==="quote")insertAtCursor(ta,"\n> **核心要点**：","","提示内容");
+  else if(act==="tpl"){
+    const tpl=`## **1. 整体定义**\n- **核心目标**：\n\n---\n\n## **2. 原理解释**\n- **底层逻辑**：\n- **关键防坑点**：\n\n---\n\n## **3. Gate 标准**\n- **检查方法与通过依据**：\n`;
+    insertAtCursor(ta,ta.value.trim()?"\n\n"+tpl:tpl,"","");
+  }
+});
+
+/* ✨ 一键美化排版按钮 */
+$("nb-beautify-btn").onclick=()=>{
+  const ta=activeTextarea();
+  ta.value=beautifyMarkdownText(ta.value);
+  ta.dispatchEvent(new Event("input"));
+  setPreview(true);
+};
+
+/* 支持 Tab 缩进 */
+[$("nb-note-input"),$("nb-case-body-input")].forEach(ta=>{
+  ta.addEventListener("keydown",e=>{
+    if(e.key==="Tab"){
+      e.preventDefault();
+      const s=ta.selectionStart,end=ta.selectionEnd;
+      ta.value=ta.value.substring(0,s)+"  "+ta.value.substring(end);
+      ta.selectionStart=ta.selectionEnd=s+2;
+      ta.dispatchEvent(new Event("input"));
+    }
+  });
+});
+
+/* 案例切换、新增与删除 */
+$("nb-case-tabs").addEventListener("click",e=>{
+  const cbtn=e.target.closest("[data-cidx]");
+  if(cbtn){
+    activeCaseIdx=+cbtn.dataset.cidx;
+    renderRightPane();
+    return;
+  }
+  if(e.target.closest("#nb-case-add-btn")){
+    if(!cur)return;
+    const entry=getEntry(cur);
+    if(!entry.cases.length)entry.cases=[{title:"",tag:"",body:""}];
+    entry.cases.push({title:"",tag:"",body:""});
+    activeCaseIdx=entry.cases.length-1;
+    setEntry(cur,entry);
+    if(previewMode)setPreview(false);else renderRightPane();
+    $("nb-case-title-input").focus();
+    return;
+  }
+  if(e.target.closest("#nb-case-del-btn")){
+    if(!cur)return;
+    const entry=getEntry(cur);
+    if(!confirm("确定删除当前案例吗？"))return;
+    if(entry.cases.length<=1){
+      entry.cases=[];
+      activeCaseIdx=0;
+    }else{
+      entry.cases.splice(activeCaseIdx,1);
+      activeCaseIdx=Math.max(0,activeCaseIdx-1);
+    }
+    setEntry(cur,entry);
+    renderRightPane();
+  }
+});
+
+function autoPreviewFor(n,m){
+  if(!n)return false;
+  return m==="note"?hasNote(n):caseCount(n)>0;
+}
+function setRead(m){
+  readMode=m;
+  root.querySelectorAll("[data-read]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.read===m)));
+  $("nb-note-panel").hidden=m!=="note";
+  $("nb-case-panel").hidden=m!=="case";
+  setPreview(autoPreviewFor(cur,m));
+}
+root.querySelectorAll("[data-read]").forEach(b=>b.onclick=()=>setRead(b.dataset.read));
+
+function setPreview(p){
+  previewMode=p;
+  $("nb-preview-toggle").setAttribute("aria-pressed",String(p));
+  $("nb-preview-toggle").textContent=p?"✏️ 编辑内容":"👁️ 预览排版";
+  $("nb-md-toolbar").hidden=p;
+  renderRightPane();
+}
+$("nb-preview-toggle").onclick=()=>setPreview(!previewMode);
+[$("nb-note-preview"),$("nb-case-preview")].forEach(el=>{
+  el.title="双击可直接进入编辑模式";
+  el.addEventListener("dblclick",()=>setPreview(false));
+});
+
+/* 📋 一键复制全部已写内容给 AI */
+$("nb-copy-all").onclick=async()=>{
+  const records=[];
+  const seen=new Set();
+  Object.keys(store).forEach(k=>{
+    if(k.includes("::"))return;
+    const r=store[k];
+    if(!r||seen.has(r.key))return;
+    seen.add(r.key);
+    records.push(r);
+  });
+  if(!records.length){
+    alert("当前还没有保存任何笔记或案例内容。");
+    return;
+  }
+  const text=records.map(r=>{
+    const cs=validCases(r).map((c,i)=>`  [案例 ${i+1}] 标题：${c.title||"未命名"}（分类：${c.tag||"无"}）\n${c.body}`).join("\n\n");
+    return `【节点】${r.path} (${r.key})\n【笔记】\n${r.note||"（空）"}\n${cs?`【案例演示】\n${cs}`:""}`;
+  }).join("\n\n====================\n\n");
+  try{
+    await navigator.clipboard.writeText(text);
+    const btn=$("nb-copy-all");
+    const old=btn.textContent;
+    btn.textContent="✅ 已复制！可直接粘贴给AI";
+    setTimeout(()=>btn.textContent=old,2500);
+  }catch(e){
+    prompt("请按 Cmd+C 复制以下已写内容发给 AI：",text);
+  }
+};
+
+/* 导出与导入 JSON 备份 */
+$("nb-export").onclick=()=>{
+  const blob=new Blob([JSON.stringify({version:1,exportedAt:new Date().toISOString(),data:store},null,2)],{type:"application/json;charset=utf-8"});
+  const a=document.createElement("a");
+  const d=new Date().toISOString().slice(0,10);
+  a.href=URL.createObjectURL(blob);
+  a.download=`实验室知识体系_笔记与案例备份_${d}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+};
+$("nb-import").onclick=()=>$("nb-import-file").click();
+$("nb-import-file").addEventListener("change",e=>{
+  const f=e.target.files&&e.target.files[0];
+  if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const parsed=JSON.parse(r.result);
+      const incoming=parsed.data||parsed;
+      if(typeof incoming==="object"&&incoming){
+        Object.assign(store,incoming);
+        localStorage.setItem(STORE_KEY,JSON.stringify(store));
+        renderMap(true);
+        renderRightPane();
+        $("nb-save-state").textContent="已导入备份";
+        $("nb-save-state").classList.add("saved");
+      }
+    }catch(err){
+      alert("导入失败：JSON 文件格式不正确");
+    }
+    e.target.value="";
+  };
+  r.readAsText(f);
+});
+
+/* 节点选择与视图切换 */
+function select(n,opts={}){
+  ancestors(n).forEach(p=>{if(p!==tab.root)tab.open.add(p._k)});
+  const prev=cur;cur=n;
+  if(prev!==n)activeCaseIdx=0;
+  renderMap(true);
+  if(!opts.noReveal)reveal(n,false);
+  if(opts.read)setRead(opts.read);
+  else setPreview(autoPreviewFor(n,readMode));
+  if(root.clientWidth<=650&&opts.mobile!==false&&prev)mobile("read");
+  try{history.replaceState(null,"","#"+n._k)}catch(e){}
+}
+function renderViews(){
+  $("nb-views").innerHTML=tabs.map(t=>`<button type="button" data-t="${t.id}" aria-pressed="${t===tab}">${esc(t.label)}</button>`).join("");
+}
+function goTab(id){
+  tab=tabs.find(t=>t.id===id)||tabs[0];
+  renderViews();hits=[];$("nb-q").value="";$("nb-qn").textContent="点节点写笔记/案例";
+  cur=null;renderMap();select(tab.root,{mobile:false});
+}
+function mobile(v){
+  root.dataset.mobile=v;
+  root.querySelectorAll("[data-mobile]").forEach(b=>b.tagName==="BUTTON"&&b.setAttribute("aria-pressed",String(b.dataset.mobile===v)));
+  if(v==="map")requestAnimationFrame(()=>renderMap());
+}
+root.querySelectorAll("button[data-mobile]").forEach(b=>b.onclick=()=>mobile(b.dataset.mobile));
+document.addEventListener("click",e=>{
+  const t=e.target.closest("[data-t]");if(t){goTab(t.dataset.t);return}
+});
+
+/* 搜索节点标题、个人笔记、个人案例 */
+$("nb-q").addEventListener("input",()=>{
+  const q=$("nb-q").value.trim().toLowerCase();hits=[];hitI=-1;
+  if(q){
+    (function f(n){
+      const e=getEntry(n);
+      const caseTxt=(e.cases||[]).map(c=>`${c.title} ${c.tag} ${c.body}`).join(" ");
+      const hay=(n.t+" "+e.note+" "+caseTxt).toLowerCase();
+      if(n!==tab.root&&hay.includes(q))hits.push(n);
+      (n.c||[]).forEach(f);
+    })(tab.root);
+    hits.forEach(h=>ancestors(h).forEach(p=>{if(p!==tab.root)tab.open.add(p._k)}));
+  }
+  $("nb-qn").textContent=q?`${hits.length} 处 · 回车跳转`:"点节点写笔记/案例";
+  renderMap();
+});
+$("nb-q").addEventListener("keydown",e=>{
+  if(e.key==="Enter"&&hits.length){
+    hitI=(hitI+1)%hits.length;
+    select(hits[hitI],{mobile:false});
+    $("nb-qn").textContent=`${hitI+1} / ${hits.length}`;
+  }
+});
+
+let last="";
+new ResizeObserver(()=>{
+  layout();
+  const s=stage.clientWidth+":"+stage.clientHeight;
+  if(s!==last&&stage.clientWidth){last=s;requestAnimationFrame(()=>renderMap())}
+}).observe(root);
+
+layout();mobile("map");
+const h=decodeURIComponent(location.hash.slice(1));
+if(h&&byKey[h]){
+  tab=tabs.find(t=>h===t.id||h.startsWith(t.id+"."));
+  renderViews();cur=null;renderMap();select(byKey[h],{mobile:false});
+}else if(tabs.length){
+  goTab("learn");
+}
+})();
+</script>
+</body>
+</html>
